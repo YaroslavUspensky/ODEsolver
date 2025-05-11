@@ -3,22 +3,39 @@ import matplotlib.pyplot as plt
 from typing import Tuple, Callable
 
 
-def euler(f: Callable[..., float], segment: Tuple[float, float], y0: float, n: int = 10000, plot=True):
+def euler(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: int = 10000, plot=True):
     """
-    Функция находит численное решение ОДУ заданного в нормальной форме:
-    dy/dx = f(x, y).
+    Решает обыкновенное дифференциальное уравнение (ОДУ) методом Эйлера.
 
-    :param f: y' = f(x, y)
-    :param segment: [x0, x1] - решение ищется на этом отрезке
-    :param y0: y(x0) = y0
-    :param n: - число разбиений отрезка, число узлов сетки: n+1
-    :param plot: если True, то дополнительно выведется график
-    :return: последовательность точек {(x_i, y_i)}
+    Параметры
+    ----------
+    f : callable
+        Функция правой части ОДУ вида y' = f(x, y).
+        Должна принимать два аргумента: x (float) и y (float),
+        и возвращать значение производной (float).
+
+    interval : tuple of float
+        Интервал интегрирования в виде (x0, x1), где x0 - начальная точка, x1 - конечная точка.
+
+    y0 : float
+        Начальное значение y(x0) для выделения частного решения.
+
+    n : int
+        Количество разбиений сетки.
+
+    plot : bool, optional
+        Если True, строит график решения (по умолчанию True).
+
+    Возвращает
+    -------
+    list of tuple
+        Список пар (x, y) - точек численного решения ОДУ.
+        Длина списка будет n+1 (включая начальную точку).
     """
 
-    h = (segment[1] - segment[0]) / n
+    h = (interval[1] - interval[0]) / n
 
-    X = np.linspace(segment[0], segment[1], n)
+    X = np.linspace(interval[0], interval[1], n)
     Y = np.zeros(n)
     Y[0] = y0
 
@@ -31,5 +48,4 @@ def euler(f: Callable[..., float], segment: Tuple[float, float], y0: float, n: i
         plt.grid()
         plt.show()
 
-
-    return X, Y
+    return np.vstack([X, Y]).T
