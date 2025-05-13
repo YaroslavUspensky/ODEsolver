@@ -1,9 +1,56 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Callable, Tuple
+from typing import Callable, Iterable
 
 
-def erk1(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: int = 10000, plot=True):
+def euler(f: Callable[..., float], interval: Iterable[float], y0: float, n: int = 10000, plot=True):
+    """
+    Решает обыкновенное дифференциальное уравнение (ОДУ) методом Эйлера.
+
+    Параметры
+    ----------
+    f : callable
+        Функция правой части ОДУ вида y' = f(x, y).
+        Должна принимать два аргумента: x (float) и y (float),
+        и возвращать значение производной (float).
+
+    interval : tuple of float
+        Интервал интегрирования в виде (x0, x1), где x0 - начальная точка, x1 - конечная точка.
+
+    y0 : float
+        Начальное значение y(x0) для выделения частного решения.
+
+    n : int, optional
+        Количество разбиений сетки.
+
+    plot : bool, optional
+        Если True, строит график решения (по умолчанию True).
+
+    Возвращает
+    -------
+    list of tuple
+        Список пар (x, y) - точек численного решения ОДУ.
+        Длина списка будет n+1 (включая начальную точку).
+    """
+    h = (interval[1] - interval[0]) / n
+
+    X = np.linspace(interval[0], interval[1], n)
+    Y = np.zeros(n)
+    Y[0] = y0
+
+    for i in range(n-1):
+        Y[i+1] = Y[i] + h * f(X[i], Y[i])
+
+
+    if plot:
+        plt.plot(X, Y)
+        plt.grid()
+        plt.show()
+
+    return np.vstack([X, Y]).T
+
+
+def erk1(f: Callable[..., float], interval: Iterable[float], y0: float, n: int = 10000, plot=True):
     """
     Решает обыкновенное дифференциальное уравнение (ОДУ) методом Рунге-Кутты 1-го порядка.
 
@@ -20,7 +67,7 @@ def erk1(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: i
     y0 : float
         Начальное значение y(x0) для выделения частного решения.
 
-    n : int
+    n : int, optional
         Количество разбиений сетки.
 
     plot : bool, optional
@@ -53,7 +100,7 @@ def erk1(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: i
     return np.vstack([X, Y]).T
 
 
-def erk2(f: Callable[..., float], interval: Tuple[float, float], y0, n: int = 10000, plot=True):
+def erk2(f: Callable[..., float], interval: Iterable[float], y0, n: int = 10000, plot=True):
     """
     Решает обыкновенное дифференциальное уравнение (ОДУ) методом Рунге-Кутты 2-го порядка.
 
@@ -70,7 +117,7 @@ def erk2(f: Callable[..., float], interval: Tuple[float, float], y0, n: int = 10
     y0 : float
         Начальное значение y(x0) для выделения частного решения.
 
-    n : int
+    n : int, optional
         Количество разбиений сетки.
 
     plot : bool, optional
@@ -113,7 +160,7 @@ def erk2(f: Callable[..., float], interval: Tuple[float, float], y0, n: int = 10
     return np.vstack([X, Y]).T
 
 
-def erk3(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=10000, plot=True):
+def erk3(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, plot=True):
     """
     Решает обыкновенное дифференциальное уравнение (ОДУ) методом Рунге-Кутты 3-го порядка.
 
@@ -130,7 +177,7 @@ def erk3(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
     y0 : float
         Начальное значение y(x0) для выделения частного решения.
 
-    n : int
+    n : int, optional
         Количество разбиений сетки.
 
     plot : bool, optional
@@ -182,7 +229,7 @@ def erk3(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
     return np.vstack([X, Y]).T
 
 
-def erk4(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=10000, plot=True):
+def erk4(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, plot=True):
     """
     Решает обыкновенное дифференциальное уравнение (ОДУ) методом Рунге-Кутты 4-го порядка.
 
@@ -199,7 +246,7 @@ def erk4(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
     y0 : float
         Начальное значение y(x0) для выделения частного решения.
 
-    n : int
+    n : int, optional
         Количество разбиений сетки.
 
     plot : bool, optional
