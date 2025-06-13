@@ -1,9 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from typing import Callable, Iterable
+from typing import Callable, Tuple
 
-
-def euler(f: Callable[..., float], interval: Iterable[float], y0: float, n: int = 10000, plot=True):
+def euler(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: int = 10000):
     """
     Решает обыкновенное дифференциальное уравнение (ОДУ) методом Эйлера.
 
@@ -14,7 +12,7 @@ def euler(f: Callable[..., float], interval: Iterable[float], y0: float, n: int 
         Должна принимать два аргумента: x (float) и y (float),
         и возвращать значение производной (float).
 
-    interval : tuple of float
+    interval :
         Интервал интегрирования в виде (x0, x1), где x0 - начальная точка, x1 - конечная точка.
 
     y0 : float
@@ -22,9 +20,6 @@ def euler(f: Callable[..., float], interval: Iterable[float], y0: float, n: int 
 
     n : int, optional
         Количество разбиений сетки.
-
-    plot : bool, optional
-        Если True, строит график решения (по умолчанию True).
 
     Возвращает
     -------
@@ -36,21 +31,18 @@ def euler(f: Callable[..., float], interval: Iterable[float], y0: float, n: int 
 
     X = np.linspace(interval[0], interval[1], n)
     Y = np.zeros(n)
+    Yprime = np.zeros(n)
     Y[0] = y0
+    Yprime[0] = f(X[0], y0)
 
     for i in range(n-1):
+        Yprime[i+1] = f([X[i], Y[i]])
         Y[i+1] = Y[i] + h * f(X[i], Y[i])
 
-
-    if plot:
-        plt.plot(X, Y)
-        plt.grid()
-        plt.show()
-
-    return np.vstack([X, Y]).T
+    return X, Y, Yprime
 
 
-def erk1(f: Callable[..., float], interval: Iterable[float], y0: float, n: int = 10000, plot=True):
+def erk1(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: int = 10000):
     """
     Решает обыкновенное дифференциальное уравнение (ОДУ) методом Рунге-Кутты 1-го порядка.
 
@@ -61,7 +53,7 @@ def erk1(f: Callable[..., float], interval: Iterable[float], y0: float, n: int =
         Должна принимать два аргумента: x (float) и y (float),
         и возвращать значение производной (float).
 
-    interval : tuple of float
+    interval :
         Интервал интегрирования в виде (x0, x1), где x0 - начальная точка, x1 - конечная точка.
 
     y0 : float
@@ -69,9 +61,6 @@ def erk1(f: Callable[..., float], interval: Iterable[float], y0: float, n: int =
 
     n : int, optional
         Количество разбиений сетки.
-
-    plot : bool, optional
-        Если True, строит график решения (по умолчанию True).
 
     Возвращает
     -------
@@ -84,7 +73,9 @@ def erk1(f: Callable[..., float], interval: Iterable[float], y0: float, n: int =
 
     X = np.linspace(interval[0], interval[1], n)
     Y = np.zeros(n)
+    Yprime = np.zeros(n)
     Y[0] = y0
+    Yprime[0] = f(X[0], y0)
 
     b = 1
     c = .5
@@ -92,15 +83,10 @@ def erk1(f: Callable[..., float], interval: Iterable[float], y0: float, n: int =
     for i in range(n-1):
         Y[i+1] = Y[i] + h * b * f(X[i] + h*c, Y[i])
 
-    if plot:
-        plt.plot(X, Y)
-        plt.grid()
-        plt.show()
-
-    return np.vstack([X, Y]).T
+    return X, Y, Yprime
 
 
-def erk2(f: Callable[..., float], interval: Iterable[float], y0, n: int = 10000, plot=True):
+def erk2(f: Callable[..., float], interval: Tuple[float, float], y0, n: int = 10000):
     """
     Решает обыкновенное дифференциальное уравнение (ОДУ) методом Рунге-Кутты 2-го порядка.
 
@@ -111,7 +97,7 @@ def erk2(f: Callable[..., float], interval: Iterable[float], y0, n: int = 10000,
         Должна принимать два аргумента: x (float) и y (float),
         и возвращать значение производной (float).
 
-    interval : tuple of float
+    interval :
         Интервал интегрирования в виде (x0, x1), где x0 - начальная точка, x1 - конечная точка.
 
     y0 : float
@@ -119,9 +105,6 @@ def erk2(f: Callable[..., float], interval: Iterable[float], y0, n: int = 10000,
 
     n : int, optional
         Количество разбиений сетки.
-
-    plot : bool, optional
-        Если True, строит график решения (по умолчанию True).
 
     Возвращает
     -------
@@ -134,7 +117,9 @@ def erk2(f: Callable[..., float], interval: Iterable[float], y0, n: int = 10000,
 
     X = np.linspace(interval[0], interval[1], n)
     Y = np.zeros(n)
+    Yprime = np.zeros(n)
     Y[0] = y0
+    Yprime[0] = f(X[0], y0)
 
     B = np.array([.25, .75])
     c2 = 2/3
@@ -152,15 +137,10 @@ def erk2(f: Callable[..., float], interval: Iterable[float], y0, n: int = 10000,
         W = np.array([w1, w2])
         Y[i+1] = Y[i] + h * (B @ W)
 
-    if plot:
-        plt.plot(X, Y)
-        plt.grid()
-        plt.show()
-
-    return np.vstack([X, Y]).T
+    return X, Y, Yprime
 
 
-def erk3(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, plot=True):
+def erk3(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=10000):
     """
     Решает обыкновенное дифференциальное уравнение (ОДУ) методом Рунге-Кутты 3-го порядка.
 
@@ -171,7 +151,7 @@ def erk3(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, p
         Должна принимать два аргумента: x (float) и y (float),
         и возвращать значение производной (float).
 
-    interval : tuple of float
+    interval :
         Интервал интегрирования в виде (x0, x1), где x0 - начальная точка, x1 - конечная точка.
 
     y0 : float
@@ -179,9 +159,6 @@ def erk3(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, p
 
     n : int, optional
         Количество разбиений сетки.
-
-    plot : bool, optional
-        Если True, строит график решения (по умолчанию True).
 
     Возвращает
     -------
@@ -194,7 +171,9 @@ def erk3(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, p
 
     X = np.linspace(interval[0], interval[1], n)
     Y = np.zeros(n)
+    Yprime = np.zeros(n)
     Y[0] = y0
+    Yprime[0] = f(X[0], y0)
 
 
     B = np.array([1/6, 2/3, 1/6])
@@ -221,15 +200,10 @@ def erk3(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, p
 
         Y[i+1] = Y[i] + h * (B @ W)
 
-    if plot:
-        plt.plot(X, Y)
-        plt.grid()
-        plt.show()
-
-    return np.vstack([X, Y]).T
+    return X, Y, Yprime
 
 
-def erk4(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, plot=True):
+def erk4(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=10000):
     """
     Решает обыкновенное дифференциальное уравнение (ОДУ) методом Рунге-Кутты 4-го порядка.
 
@@ -240,7 +214,7 @@ def erk4(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, p
         Должна принимать два аргумента: x (float) и y (float),
         и возвращать значение производной (float).
 
-    interval : tuple of float
+    interval :
         Интервал интегрирования в виде (x0, x1), где x0 - начальная точка, x1 - конечная точка.
 
     y0 : float
@@ -248,9 +222,6 @@ def erk4(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, p
 
     n : int, optional
         Количество разбиений сетки.
-
-    plot : bool, optional
-        Если True, строит график решения (по умолчанию True).
 
     Возвращает
     -------
@@ -263,7 +234,9 @@ def erk4(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, p
 
     X = np.linspace(interval[0], interval[1], n)
     Y = np.zeros(n)
+    Yprime = np.zeros(n)
     Y[0] = y0
+    Yprime[0] = f(X[0], y0)
 
     B = np.array([1/6, 1/3, 1/3, 1/6])
     c2 = .5
@@ -290,9 +263,4 @@ def erk4(f: Callable[..., float], interval: Iterable[float], y0, n: int=10000, p
         W = np.array([w1, w2, w3, w4])
         Y[i+1] = Y[i] + h * (B @ W)
 
-    if plot:
-        plt.plot(X, Y)
-        plt.grid()
-        plt.show()
-
-    return np.vstack([X, Y]).T
+    return X, Y, Yprime
