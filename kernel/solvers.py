@@ -36,8 +36,8 @@ def euler(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: 
     Yprime[0] = f(X[0], y0)
 
     for i in range(n-1):
-        Yprime[i+1] = f([X[i], Y[i]])
         Y[i+1] = Y[i] + h * f(X[i], Y[i])
+        Yprime[i + 1] = f(X[i], Y[i])
 
     return X, Y, Yprime
 
@@ -82,6 +82,7 @@ def erk1(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: i
 
     for i in range(n-1):
         Y[i+1] = Y[i] + h * b * f(X[i] + h*c, Y[i])
+        Yprime[i + 1] = f(X[i], Y[i])
 
     return X, Y, Yprime
 
@@ -136,6 +137,7 @@ def erk2(f: Callable[..., float], interval: Tuple[float, float], y0, n: int = 10
 
         W = np.array([w1, w2])
         Y[i+1] = Y[i] + h * (B @ W)
+        Yprime[i + 1] = f(X[i], Y[i])
 
     return X, Y, Yprime
 
@@ -199,6 +201,7 @@ def erk3(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
         W = np.array([w1, w2, w3])
 
         Y[i+1] = Y[i] + h * (B @ W)
+        Yprime[i + 1] = f(X[i], Y[i])
 
     return X, Y, Yprime
 
@@ -255,6 +258,7 @@ def erk4(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
     #    | b1 b2 b3 b4
 
     for i in range(n-1):
+
         w1 = f(X[i], Y[i])
         w2 = f(X[i] + h * c2, Y[i] + h * a2 * w1)
         w3 = f(X[i] + h * c3, Y[i] + h * a3 * w2)
@@ -262,5 +266,6 @@ def erk4(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
 
         W = np.array([w1, w2, w3, w4])
         Y[i+1] = Y[i] + h * (B @ W)
+        Yprime[i+1] = f(X[i], Y[i])
 
     return X, Y, Yprime
