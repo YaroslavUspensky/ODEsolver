@@ -34,3 +34,10 @@ def invalid_add_settings():
     panel.setStandardButtons(QMessageBox.Ok)
     retval = panel.exec_()
 
+def invalid_n_vectors():
+    panel = QMessageBox()
+    panel.setIcon(QMessageBox.Critical)
+    panel.setWindowTitle("ODESolver: ошибка")
+    panel.setText("Количество векторов введено некорректно")
+    panel.setStandardButtons(QMessageBox.Ok)
+    retval = panel.exec_()

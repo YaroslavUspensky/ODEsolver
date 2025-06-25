@@ -4,14 +4,14 @@ WINDOW_WIDTH = 1500
 WINDOW_HEIGHT = 900
 
 
-PLOT_WIDTH_RATIO = 8  # *10 % of window WIDTH on the output side is occupied by plot
+PLOT_WIDTH_RATIO = 7  # *10 % of window WIDTH on the output side is occupied by plot
 
 LABELS_FONT = "Calibri"
 LABELS_FONTSIZE = 10
 LABELS_MAXHEIGHT = 50
 
 FIELDS_FONT = "Cambria"
-FIELDS_TXTSIZE = 15
+FIELDS_FONTSIZE = 15
 FIELDS_MAXHEIGHT = 80
 
 SOLVE_BTN_COLOR = "#32CD32"
