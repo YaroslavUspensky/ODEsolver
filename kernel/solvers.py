@@ -1,5 +1,7 @@
 import numpy as np
+import sympy as sp
 from typing import Callable, Tuple
+
 
 def euler(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: int = 10000):
     """
@@ -23,9 +25,7 @@ def euler(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: 
 
     Возвращает
     -------
-    list of tuple
-        Список пар (x, y) - точек численного решения ОДУ.
-        Длина списка будет n+1 (включая начальную точку).
+        Кортеж столбцов (x, y, y') - точек численного решения ОДУ.
     """
     h = (interval[1] - interval[0]) / n
 
@@ -64,9 +64,7 @@ def erk1(f: Callable[..., float], interval: Tuple[float, float], y0: float, n: i
 
     Возвращает
     -------
-    list of tuple
-        Список пар (x, y) - точек численного решения ОДУ.
-        Длина списка будет n+1 (включая начальную точку).
+        Кортеж столбцов (x, y, y') - точек численного решения ОДУ.
     """
 
     h = (interval[1] - interval[0]) / n
@@ -109,9 +107,7 @@ def erk2(f: Callable[..., float], interval: Tuple[float, float], y0, n: int = 10
 
     Возвращает
     -------
-    list of tuple
-        Список пар (x, y) - точек численного решения ОДУ.
-        Длина списка будет n+1 (включая начальную точку).
+        Кортеж столбцов (x, y, y') - точек численного решения ОДУ.
     """
 
     h = (interval[1] - interval[0]) / n
@@ -137,7 +133,7 @@ def erk2(f: Callable[..., float], interval: Tuple[float, float], y0, n: int = 10
 
         W = np.array([w1, w2])
         Y[i+1] = Y[i] + h * (B @ W)
-        Yprime[i + 1] = f(X[i], Y[i])
+        Yprime[i + 1] = w1
 
     return X, Y, Yprime
 
@@ -164,9 +160,7 @@ def erk3(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
 
     Возвращает
     -------
-    list of tuple
-        Список пар (x, y) - точек численного решения ОДУ.
-        Длина списка будет n+1 (включая начальную точку).
+        Кортеж столбцов (x, y, y') - точек численного решения ОДУ.
     """
 
     h = (interval[1] - interval[0]) / n
@@ -200,8 +194,8 @@ def erk3(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
 
         W = np.array([w1, w2, w3])
 
-        Y[i+1] = Y[i] + h * (B @ W)
-        Yprime[i + 1] = f(X[i], Y[i])
+        Y[i + 1] = Y[i] + h * (B @ W)
+        Yprime[i + 1] = w1
 
     return X, Y, Yprime
 
@@ -228,9 +222,7 @@ def erk4(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
 
     Возвращает
     -------
-    list of tuple
-        Список пар (x, y) - точек численного решения ОДУ.
-        Длина списка будет n+1 (включая начальную точку).
+        Кортеж столбцов (x, y, y') - точек численного решения ОДУ.
     """
 
     h = (interval[1] - interval[0]) / n
@@ -265,7 +257,71 @@ def erk4(f: Callable[..., float], interval: Tuple[float, float], y0, n: int=1000
         w4 = f(X[i] + h * c4, Y[i] + h * a4 * w3)
 
         W = np.array([w1, w2, w3, w4])
-        Y[i+1] = Y[i] + h * (B @ W)
-        Yprime[i+1] = f(X[i], Y[i])
+        Y[i + 1] = Y[i] + h * (B @ W)
+        Yprime[ i+ 1] = w1
+
+    return X, Y, Yprime
+
+
+def ros1(f_str: str, interval: Tuple[float, float], y0, alpha, n: int=100):
+    """
+    Решает обыкновенное дифференциальное уравнение (ОДУ) методом Розенброка.
+
+      alpha   | Устойчивость | Точность
+        0     |      нет     |   O(h)
+       1/2    |       A      |  O(h^2)
+        1     |      L1      |   O(h)
+    (1 + j)/2 |      L2      |  O(h^2)
+
+    Параметры
+    ----------
+    f : str
+        Строка, содержащая функцию правой части ОДУ вида y' = f(x, y).
+
+    interval :
+        Интервал интегрирования в виде (x0, x1), где x0 - начальная точка, x1 - конечная точка.
+
+    y0 : float
+        Начальное значение y(x0) для выделения частного решения.
+
+    n : int, optional
+        Количество разбиений сетки.
+
+    Возвращает
+    -------
+        Кортеж столбцов (x, y, y') - точек численного решения ОДУ.
+    """
+
+    x, y = sp.symbols('x y')
+    f_sym = sp.sympify(f_str)
+    f_func = sp.lambdify((x, y), f_sym, 'numpy')
+
+    def derivative():
+        dfdy_s = sp.diff(f_sym, y, 1)
+        dfdy_f = sp.lambdify((x, y), dfdy_s, 'numpy')
+        return dfdy_f
+
+    dfdy_func = derivative()
+
+    h = (interval[1] - interval[0]) / n
+    X = np.linspace(interval[0], interval[1], n)
+    Y = np.zeros(n)
+    Yprime = np.zeros(n)
+    Y[0] = y0
+    Yprime[0] = f_func(X[0], y0)
+
+    alpha = 1
+    b1 = 1
+    c1 = .5
+
+    for i in range(n-1):
+        #Ax = _
+        A = (1 - alpha * h * dfdy_func(X[i], Y[i]))
+        _ = f_func(X[i] + h * c1, Y[i])
+
+        w1 = _ / A
+
+        Y[i + 1] = Y[i] + h * b1 * w1.real
+        Yprime[i + 1] = f_func(X[i], Y[i])
 
     return X, Y, Yprime

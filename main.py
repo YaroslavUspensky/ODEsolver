@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import *
 
 from first_order_tab import FirstOrderTab
+from high_order_tab import HighOrderTab
 from slope_field_tab import SlopeFieldTab
 from config import *
 
@@ -15,9 +16,8 @@ class MainWindow(QMainWindow):
 
         self.tabs = QTabWidget(self)
         self.first_order_tab = FirstOrderTab()
-        self.high_order_tab = QWidget()
+        self.high_order_tab = HighOrderTab()
         self.slope_field_tab = SlopeFieldTab()
-        self.tabs.setFont()
 
         self.tabs.addTab(self.first_order_tab, "First order ODE")
         self.tabs.addTab(self.high_order_tab, "High order ODE")

@@ -1,6 +1,7 @@
+import matplotlib.pyplot as plt
 from kernel.solvers import *
 from kernel.slope_field import slope_field
-import matplotlib.pyplot as plt
+
 
 
 class Equation:
@@ -23,6 +24,8 @@ class Equation:
             self.solution = erk3(self.f, interval, y0, n)
         elif method == "erk4":
             self.solution = erk4(self.f, interval, y0, n)
+        elif method == "rosenbrock":
+            self.solution = ros1(self.f, interval, y0, n)
 
         if get_solution:
             return self.solution
